@@ -1,5 +1,13 @@
 # Anorm
 
+## This Hack
+
+If `connection.getAutoCommit` is false then invokes the `setFetchSize` of the `java.sql.Statement` to a large
+number and invokes `println` as an indication of this. Internally only `resultSet` is affected, so any execution
+path which does not include `resultSet` in its stack won't have the fetch size set.
+
+This behavior is specific to the Redshift and PostgreSQL JDBC implementations.
+
 Anorm is a simple data access layer that uses plain SQL to interact with the database and provides an API to parse and transform the resulting datasets: [More information](docs/manual/working/scalaGuide/main/sql/ScalaAnorm.md).
 
 ## Usage
