@@ -134,8 +134,11 @@ private[anorm] trait Sql extends WithResult {
     preparedStatement(connection) flatMap { stmt =>
       implicit val res = ResultSetResource
       if (!connection.getAutoCommit) {
-        stmt.setFetchSize(10000)
-        println("Setting stmt fetchSize to 10000")
+        import scala.util.control.Exception.allCatch
+        val fetchSize =
+          allCatch.opt(System.getProperty("com.typesafe.play.anorm.statement.fetchSize").toInt).getOrElse(10000)
+        stmt.setFetchSize(fetchSize)
+        println(s"Setting stmt fetchSize to $fetchSize")
       }
       managed(stmt.executeQuery())
     }
