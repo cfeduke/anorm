@@ -1,5 +1,7 @@
 # Anorm
 
+Anorm is a simple data access layer that uses plain SQL to interact with the database and provides an API to parse and transform the resulting datasets: [More information](docs/manual/working/scalaGuide/main/sql/ScalaAnorm.md).
+
 ## This Fork
 
 If `connection.getAutoCommit` is false then invokes the `setFetchSize` of the `java.sql.Statement` to a large
@@ -8,7 +10,41 @@ path which does not include `resultSet` in its stack won't have the fetch size s
 
 This behavior is specific to the Redshift and PostgreSQL JDBC implementations.
 
-Anorm is a simple data access layer that uses plain SQL to interact with the database and provides an API to parse and transform the resulting datasets: [More information](docs/manual/working/scalaGuide/main/sql/ScalaAnorm.md).
+Because you will likely need to build this for a Scala 2.11 configuration:
+
+```bash
+$ sbt
+$ sbt (anorm-parent)> ++ 2.11.7 publishLocal
+```
+
+An example of use:
+
+```scala
+// assume connection is in scope
+connection.setAutoCommit(false) // necessary for PGSQL/Redshift to page
+
+@tailrec
+def recursive(cursor: Option[Cursor], count: Long): Long = cursor match {
+    case Some(c) =>
+      val record = parseRecord(c.row)
+      printer.println(record)
+      recursive(c.next, count + 1L)
+    case None =>
+      count
+}
+
+val result: Either[List[Throwable], Long] = SQL(sql).withResult(recursive(_, 0L))
+result match {
+    case Left(errors) =>
+      errors.foreach(logger.error("While executing recursive", _))
+      sys.exit(1)
+    case Right(count) =>
+      logger.info(d"Count: $count%,d") 
+  }
+}
+
+connection.setAutoCommit(true) // good idea if you return connections to a pool that does not expect autocommit to false
+```
 
 ## Usage
 
