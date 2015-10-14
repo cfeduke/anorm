@@ -133,6 +133,10 @@ private[anorm] trait Sql extends WithResult {
   protected def resultSet(connection: Connection): ManagedResource[ResultSet] =
     preparedStatement(connection) flatMap { stmt =>
       implicit val res = ResultSetResource
+      if (connection.getAutoCommit) {
+        stmt.setFetchSize(10000)
+        println("Setting stmt fetchSize to 10000")
+      }
       managed(stmt.executeQuery())
     }
 
