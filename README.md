@@ -1,6 +1,6 @@
 # Anorm
 
-## This Hack
+## This Fork
 
 If `connection.getAutoCommit` is false then invokes the `setFetchSize` of the `java.sql.Statement` to a large
 number and invokes `println` as an indication of this. Internally only `resultSet` is affected, so any execution
@@ -16,7 +16,7 @@ In a projects built with SBT, dependency to Anorm can be added as following:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "anorm" % ReplaceByAnormVersion)
+  "com.typesafe.play" %% "anorm" % "2.5.1f-SNAPSHOT")
 ```
 
 ## Build manually
